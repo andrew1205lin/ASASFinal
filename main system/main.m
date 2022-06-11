@@ -139,11 +139,11 @@ for kk = 1:numFrames % frame index
             if median(abs(y_emph(ind))) > thres
                 [F1, F2, vowel] = vowel_classifier(A, fs);
                 disp(vowel);
-                % A = formant_transform(A, F1, F2, vowel);
+                [A] = formant_transform(A, F1, F2, vowel);
             else 
-                disp("unvoied");
+                disp("unvoiced");
             end
-
+            
             y_rec_n = filter(1, A, e_n); % Y_N = E/A
         else
             e_n = excit_disk(ind);
