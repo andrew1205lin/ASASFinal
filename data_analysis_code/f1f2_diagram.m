@@ -10,8 +10,8 @@ else
 end
 scatter(f2, f1 , [], color );
 set(gca, 'YDir','reverse');
-xlabel('F2 ( kHz )');
-ylabel('F1 ( kHz )');
+xlabel('F2 ( Hz )');
+ylabel('F1 ( Hz )');
 
 %hold off
 

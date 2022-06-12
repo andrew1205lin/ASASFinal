@@ -1,25 +1,25 @@
 ----i----
-F1 median: 352
-F1 std: 11
-F2 median: 1118
-F2 std: 252
+F1 median: 354
+F1 std: 6
+F2 median: 1162
+F2 std: 165
 ----e----
 F1 median: 500
-F1 std: 153
-F2 median: 1637
-F2 std: 383
+F1 std: 34
+F2 median: 1696
+F2 std: 188
 ----a----
-F1 median: 766
-F1 std: 85
-F2 median: 1246
-F2 std: 115
+F1 median: 754
+F1 std: 51
+F2 median: 1243
+F2 std: 27
 ----o----
 F1 median: 460
-F1 std: 35
+F1 std: 32
 F2 median
-: 895F2 std: 59
+: 894F2 std: 62
 ----u----
-F1 median: 352
-F1 std: 12
+F1 median: 351
+F1 std: 14
 F2 median: 982
-F2 std: 220
+F2 std: 93

@@ -18,46 +18,32 @@ wav_path4 = [DIR FILENAME_4 '.wav'];
 wav_path5 = [DIR FILENAME_5 '.wav'];
 
 
-[F1_1, F2_1, F3_1] = formant_analysis(wav_path1, 0.5);
-<<<<<<< HEAD
-[F1_2, F2_2, F3_2] = formant_analysis(wav_path2, 0.5);
-[F1_3, F2_3, F3_3] = formant_analysis(wav_path3, 0.5);
-[F1_4, F2_4, F3_4] = formant_analysis(wav_path4, 0.5);
-[F1_5, F2_5, F3_5] = formant_analysis(wav_path5, 0.5);
-% remove zeros
-=======
-[F1_2, F2_2, F3_2] = formant_analysis(wav_path2, 0.2);
-[F1_3, F2_3, F3_3] = formant_analysis(wav_path3, 0.5);
-[F1_4, F2_4, F3_4] = formant_analysis(wav_path4, 0.5);
-[F1_5, F2_5, F3_5] = formant_analysis(wav_path5, 0.5);
+[F1_1, F2_1, F3_1] = formant_analysis(wav_path1, 0.35);
+[F1_2, F2_2, F3_2] = formant_analysis(wav_path2, 0.35);
+[F1_3, F2_3, F3_3] = formant_analysis(wav_path3, 0.35);
+[F1_4, F2_4, F3_4] = formant_analysis(wav_path4, 0.35);
+[F1_5, F2_5, F3_5] = formant_analysis(wav_path5, 0.35);
 
->>>>>>> 64a039fc60c45ef565d5143c92481b9806b22abd
-F1_1 = F1_1(F1_1~=0);
-F2_1 = F2_1(F2_1~=0);
-F1_2 = F1_2(F1_2~=0);
-F2_2 = F2_2(F2_2~=0);
-F1_3 = F1_3(F1_3~=0);
-F2_3 = F2_3(F2_3~=0);
-F1_4 = F1_4(F1_4~=0);
-F2_4 = F2_4(F2_4~=0);
-F1_5 = F1_5(F1_5~=0);
-F2_5 = F2_5(F2_5~=0);
-% remove unreliable points
-for i = 1: length(F1_1)
-    if (F1_1 - median(F1_1) > 1.5*std(F1_1)) || (F2_1 - median(F2_1) > 1.5*std(F2_1))
-        
-    end  
-end
-F1_1 = F1_1((F1_1 - median(F1_1) < 1.5*std(F1_1)));
-F2_1 = F2_1((F2_1 - median(F2_1) < 1.5*std(F2_1)));
-F1_2 = F1_2((F1_2 - median(F1_2) < 1.5*std(F1_2)));
-F2_2 = F2_2((F2_2 - median(F2_2) < 1.5*std(F2_2)));
-F1_3 = F1_3((F1_3 - median(F1_3) < 1.5*std(F1_3)));
-F2_3 = F2_3((F2_3 - median(F2_3) < 1.5*std(F2_3)));
-F1_4 = F1_4((F1_4 - median(F1_4) < 1.5*std(F1_4)));
-F2_4 = F2_4((F2_4 - median(F2_4) < 1.5*std(F2_4)));
-F1_5 = F1_5((F1_5 - median(F1_5) < 1.5*std(F1_5)));
-F2_5 = F2_5((F2_5 - median(F2_5) < 1.5*std(F2_5)));
+% remove zeros
+% F1_1 = F1_1(F1_1~=0);
+% F2_1 = F2_1(F2_1~=0);
+% F1_2 = F1_2(F1_2~=0);
+% F2_2 = F2_2(F2_2~=0);
+% F1_3 = F1_3(F1_3~=0);
+% F2_3 = F2_3(F2_3~=0);
+% F1_4 = F1_4(F1_4~=0);
+% F2_4 = F2_4(F2_4~=0);
+% F1_5 = F1_5(F1_5~=0);
+% F2_5 = F2_5(F2_5~=0);
+
+f1f2_diagram(F1_2, F2_2, 0, 0, 'black');
+% remove unreliable points(distance bigger than 1 std will be rm)
+[F1_1, F2_1] = data_cleaner(F1_1, F2_1, 1.2); 
+[F1_2, F2_2] = data_cleaner(F1_2, F2_2, 1.2);
+[F1_3, F2_3] = data_cleaner(F1_3, F2_3, 1.2);
+[F1_4, F2_4] = data_cleaner(F1_4, F2_4, 1.2);
+[F1_5, F2_5] = data_cleaner(F1_5, F2_5, 1.2);
+
  
 f1f2_diagram(F1_1, F2_1, 0, 0, 'red'); %(f1,f2, save, overlay, color)
 f1f2_diagram(F1_2, F2_2, 0, 1, 'yellow');
