@@ -18,11 +18,11 @@ wav_path4 = [DIR FILENAME_4 '.wav'];
 wav_path5 = [DIR FILENAME_5 '.wav'];
 
 
-[F1_1, F2_1, F3_1] = formant_analysis(wav_path1, 0.35);
-[F1_2, F2_2, F3_2] = formant_analysis(wav_path2, 0.35);
-[F1_3, F2_3, F3_3] = formant_analysis(wav_path3, 0.35);
-[F1_4, F2_4, F3_4] = formant_analysis(wav_path4, 0.35);
-[F1_5, F2_5, F3_5] = formant_analysis(wav_path5, 0.35);
+[F1_1, F2_1, F3_1, ~] = formant_analysis(wav_path1, 0.35);
+[F1_2, F2_2, F3_2, ~] = formant_analysis(wav_path2, 0.35);
+[F1_3, F2_3, F3_3, ~] = formant_analysis(wav_path3, 0.35);
+[F1_4, F2_4, F3_4, ~] = formant_analysis(wav_path4, 0.35);
+[F1_5, F2_5, F3_5, ~] = formant_analysis(wav_path5, 0.35);
 
 % remove zeros
 % F1_1 = F1_1(F1_1~=0);
