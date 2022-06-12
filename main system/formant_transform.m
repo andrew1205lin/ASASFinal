@@ -30,13 +30,17 @@ function [A_new] = formant_transform(A, F1, F2, vowel)
     delta_omega1 = (omega1-W(i_3dB));
     r1 = 1-delta_omega1;
     A1 = [1 -2*r1*cos(omega1) r1*r1];
-
+    i_3dB2 = nan;
     for i=locs(2):2*locs(2)
         if abs(H(i)) < pks(2)*0.707
             i_3dB2 = i;
             break
         end
     end
+    if isnan(i_3dB2)
+        A_new = A;
+        return
+    end    
     omega2 = W(locs(2));
     delta_omega2 = (W(i_3dB2)-omega2);
     r2 = 1-delta_omega2;
@@ -69,7 +73,7 @@ function [A_new] = formant_transform(A, F1, F2, vowel)
             avg_f1_b = 352;
             std_f1_b = 12;    
             avg_f2_b = 982;
-            std_f2_b = 220;
+            std_f2_b = -220;
         case "e"
             avg_f1_a = 531;
             std_f1_a = 43;

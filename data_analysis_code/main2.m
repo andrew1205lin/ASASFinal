@@ -14,12 +14,15 @@ wav_path2 = [DIR FILENAME_2 '.wav'];
 wav_path3 = [DIR FILENAME_3 '.wav'];
 [y, fs1] = audioread(wav_path3);
 
-[A_ave_1] = formant_analysis2(wav_path1,5);
-[A_ave_2] = formant_analysis2(wav_path2, 4);
+[A_ave_1] = formant_analysis2(wav_path1,18, 0.4);
+[A_ave_2] = formant_analysis2(wav_path2, 18, 0.2);
+out = filter(A_ave_2, A_ave_1,y);
 
-out = filter(2*A_ave_2, A_ave_1,y);
+%[out_low, d] = lowpass(out,5000,fs1);
+
 %sound(out, fs1);
-audiowrite("./Results/ouput_low.wav",out, fs1)
+audiowrite("./Results/ouput_low_med.wav",out, fs1)
+
 Nfreqs = 1024;
 fs = 16000;
 df = fs/2/Nfreqs;
@@ -32,10 +35,14 @@ plot(ff,20*log10(abs(H1)));
 hold on;
 plot(ff,20*log10(abs(H2)));
 legend("bone", "air")
+xlabel("Frequency(Hz)")
+ylabel("Gain(dB)")
 [H3, ~]= freqz(A_ave_2, A_ave_1, Nfreqs);
 figure(2)
 plot(ff,20*log10(abs(H3)));
 legend("gain")
+xlabel("Frequency(Hz)")
+ylabel("Gain(dB)")
 % remove zeros
 % F1_1 = F1_1(F1_1~=0);
 % F2_1 = F2_1(F2_1~=0);
@@ -54,7 +61,7 @@ legend("gain")
 
 %legend("air", "bone")
 
-setFontSizeForAll(12);
+setFontSizeForAll(14);
 %% data mean variance display
 
 

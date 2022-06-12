@@ -139,7 +139,7 @@ for kk = 1:numFrames % frame index
             if median(abs(y_emph(ind))) > thres
                 [F1, F2, vowel] = vowel_classifier(A, fs);
                 disp(vowel);
-                [A] = formant_transform(A, F1, F2, vowel);
+                [A] = formant_transform_fun(A, F1, F2, vowel);
             else 
                 disp("unvoiced");
             end
@@ -296,8 +296,8 @@ if write_to_disk == 1
     filename_rec = "rec_p"+ int2str(p)+ "_"+way;
     filename_vc = "vc_p"+ int2str(p)+ "_"+way;
     if ~Voice_Convert
-        audiowrite(folder+filename_rec+".wav",y_rec,fs);
-        audiowrite(folder+filename_ex+".wav",excitat,fs);
+        audiowrite(folder+filename_rec+"_fun.wav",y_rec,fs);
+        audiowrite(folder+filename_ex+"_fun.wav",excitat,fs);
     else
         audiowrite(folder+filename_vc+".wav",y_vc,fs);
     end

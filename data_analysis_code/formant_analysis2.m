@@ -7,7 +7,7 @@
 % Output: F1,F2, F3 (arrays)
 %%%%%%%%%%%%%%%%
 
-function [A_ave] = formant_analysis2(wav_path,numCoefs)
+function [A_ave] = formant_analysis2(wav_path,numCoefs,thres_percent)
 [y, fs1] = audioread(wav_path);
 
 %% stereo to mono
@@ -48,7 +48,7 @@ numFrames = floor(length(y)/L);
 excitat = zeros(size(y));
 e_n = zeros(p+L,1);
 
-LPcoeffs = zeros(p+1,numFrames);
+%LPcoeffs = zeros(p+1,numFrames);
 f1 = zeros(1,numFrames); % 1st formant
 f2 = zeros(1,numFrames); % 2nd formant
 f3 = zeros(1,numFrames); % 3rd formant
@@ -66,10 +66,11 @@ end
 
 %% set a threshold for voice activity detection
 ymax = max(abs(y_emph));
-% thres = thres_percent*ymax;
+thres = thres_percent*ymax;
 
 %% Linear prediction and smooth synthesis of the estimated source e_n
 win = ones(L,1); % Rectangular window.
+LPcoeffs = zeros(p+1, 1);
 for kk = 1:numFrames
     ind = (kk-1)*L+1:kk*L;
     ywin = y_emph(ind).*win;
@@ -121,12 +122,14 @@ for kk = 1:numFrames
         drawnow;
         %pause;
     end
-    LPcoeffs(:,kk) = A;
-
-    A_ave = zeros(1, p+1);
-    for i = 1: p+1
-        A_ave(i) = median(LPcoeffs(i, :));
+    A = A';
+    
+    if max(abs(y_emph(ind))) > thres % voice activity detected
+        LPcoeffs = [LPcoeffs A];
     end
 end
-
-
+A_ave = zeros(1, p+1);
+for i = 1: p+1
+    A_ave(i) = median(LPcoeffs(i, :));
+end
+end

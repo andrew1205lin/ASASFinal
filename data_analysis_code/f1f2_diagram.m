@@ -8,7 +8,7 @@ else
     hold on
     figure(1)
 end
-scatter(f2, f1 , [], color );
+scatter(f2, f1 , [], color, "filled");
 set(gca, 'YDir','reverse');
 xlabel('F2 ( Hz )');
 ylabel('F1 ( Hz )');

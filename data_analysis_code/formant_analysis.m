@@ -7,7 +7,7 @@
 % Output: F1,F2, F3 (arrays)
 %%%%%%%%%%%%%%%%
 
-function [f1, f2, f3, A_ave] = formant_analysis(wav_path, thres_percent, numCoefs)
+function [f1, f2, f3, A_ave] = formant_analysis(wav_path, thres_percent)
 [y, fs1] = audioread(wav_path);
 
 %% stereo to mono
@@ -25,7 +25,7 @@ if fs1 ~= fs
 end
 %% Parameters to play with
 framelen = 0.050; % second. [INVESTIGATE]
-p = numCoefs; % linear prediction order. [INVESTIGATE]
+p = 18; % linear prediction order. [INVESTIGATE]
 %% remove the head zeros
 start = 1;
 while y(start)==0
