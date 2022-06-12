@@ -9,7 +9,7 @@ Overlap = 1; %[CHANGE THIS!]
 Lookback =1; %[CHANGE THIS!]
 Tail_rm = 1; %[CHANGE THIS!]
 Voice_Convert = 0; %[CHANGE THIS!]
-write_to_disk = 0; %[CHANGE THIS!]
+write_to_disk = 1; %[CHANGE THIS!]
 fs = 16000;
 
 % INPUT DIR
@@ -18,7 +18,7 @@ FILENAME = 'aiueo_a_aligned.wav';
 EXCITAT = './m3_sing/chest_excit_p30_LB_OL50_TR_32ms.wav';
 
 %OUTPUT FOLDER
-folder = "";
+folder = "./Results/";
 
 %FILENAME = 'i-male-singing.wav';
 [y,fs1] = audioread([DIR FILENAME]);
@@ -65,7 +65,7 @@ numFrames = floor((Nx - nsc)/step) + 1;
 % State
 sw.emphasis = 1; % default = 1
 sw.visOnly = 0; % Visualize the signal only. default = 0.
-
+sw.display = 0;
 
 % initialize excitation signal
 excitat = zeros(1,length(y));
@@ -200,38 +200,52 @@ for kk = 1:numFrames % frame index
         end
     end
     Y = fft(ywin,2*Nfreqs);
-%% Data visualization
-    figure(1);
-    subplot(221);
-    plot(ind/fs*1000, y(ind));
-    xlabel('ms')
-    set(gca,'xlim',[kk-1 kk]*stepLen*1000);
-    subplot(222);
-    if Tail_rm == 1
-        plot(ind/fs*1000, e_n);
-    else
-        plot(ind_l/fs*1000, e_n);
+    %% Data visualization
+    if sw.display
+        figure(1);
+        subplot(221);
+        plot(ind/fs*1000, y(ind));
+        xlabel('ms')
+        set(gca,'xlim',[kk-1 kk]*stepLen*1000);
+        subplot(222);
+        if Tail_rm == 1
+            plot(ind/fs*1000, e_n);
+        else
+            plot(ind_l/fs*1000, e_n);
+        end
+        set(gca,'xlim',[kk-1 kk]*stepLen*1000);
+
+        subplot(223);
+        [H,W] = freqz(1,A,Nfreqs);
+        Hmag = 20*log10(abs(H));
+        Ymag = 20*log10(abs(Y(1:Nfreqs))); % NEED DEBUG
+        Hmax = max(Hmag);
+        offset = max(Hmag) - max(Ymag);
+        plot(ff,Hmag); hold on;
+        plot(ff,Ymag+offset,'r'); hold off;
+        set(gca,'xlim',[0 fs/2],'ylim',[Hmax-50, Hmax+50]);
+        xlabel('Hz')
+
+        subplot(224);
+        plot(ff,Ymag+offset-Hmag.');
+        set(gca,'xlim',[0 fs/2],'ylim',[-30, 25]);
+        xlabel('Hz');
+
+        drawnow;
     end
-    set(gca,'xlim',[kk-1 kk]*stepLen*1000);
-   
-    subplot(223);
-    [H,W] = freqz(1,A,Nfreqs);
-    Hmag = 20*log10(abs(H));
-    Ymag = 20*log10(abs(Y(1:Nfreqs))); % NEED DEBUG
-    Hmax = max(Hmag);
-    offset = max(Hmag) - max(Ymag);
-    plot(ff,Hmag); hold on;
-    plot(ff,Ymag+offset,'r'); hold off;
-    set(gca,'xlim',[0 fs/2],'ylim',[Hmax-50, Hmax+50]);
-    xlabel('Hz')
-    
-    subplot(224);
-    plot(ff,Ymag+offset-Hmag.');
-    set(gca,'xlim',[0 fs/2],'ylim',[-30, 25]);
-    xlabel('Hz');
-    
-    drawnow;
     %pause;
+end
+%% limiter
+for i = 1 : length(y_rec)
+    if y_rec(i) > 0.95
+        y_rec(i) = 0.95;
+    end
+    if y_rec(i) < -0.95
+        y_rec(i) = -0.95;
+    end
+    if abs(y_rec(i)) > 0.707
+        y_rec(i) = 0.7*y_rec(i); % 80=0.5ms*16000frame/s attack
+    end
 end
 
 %% [INVESTIGATE] play the estimated source signal.
@@ -241,8 +255,8 @@ end
 figure()    
 subplot(2,1,1)
 if ~Voice_Convert
-    plot(excitat)
-    title('excitat')
+    plot(y_rec)
+    title('converted signal')
 else
     plot(excit_disk)
     title('intput excitaion')
