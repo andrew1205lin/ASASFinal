@@ -1,5 +1,5 @@
-function [A_new] = formant_transform(A, F1, F2, vowel)
-    display = 0;
+function [A_new] = formant_transform_fun(A, F1, F2, vowel)
+    display = 1;
     if vowel == "undefinable"
         A_new = A;
         return
@@ -52,19 +52,19 @@ function [A_new] = formant_transform(A, F1, F2, vowel)
             std_f1_a = 44;
             avg_f2_a = 1419;
             std_f2_a = 125;
-            avg_f1_b = 460;
-            std_f1_b = 35;
-            avg_f2_b = 895;
-            std_f2_b = 59;
+            avg_f1_b = 566;
+            std_f1_b = 44;
+            avg_f2_b = 1117;
+            std_f2_b = 56;
         case "i"
             avg_f1_a = 370;
             std_f1_a = 17;
             avg_f2_a = 1864;
             std_f2_a = 59;
-            avg_f1_b = 766;
-            std_f1_b = 85;
-            avg_f2_b = 1246;
-            std_f2_b = 27;
+            avg_f1_b = 531;
+            std_f1_b = 43;
+            avg_f2_b = 1763;
+            std_f2_b = 51;
 
 
         case "u"
@@ -72,30 +72,30 @@ function [A_new] = formant_transform(A, F1, F2, vowel)
             std_f1_a = 20;
             avg_f2_a = 1121;
             std_f2_a = 87;
-            avg_f1_b = 354;
-            std_f1_b = 6;     
-            avg_f2_b = 1162;
-            std_f2_b = 165;
+            avg_f1_b = 386;
+            std_f1_b = 20;
+            avg_f2_b = 1121;
+            std_f2_b = 87;
 
         case "e"
             avg_f1_a = 531;
             std_f1_a = 43;
             avg_f2_a = 1763;
             std_f2_a = 51;
-            avg_f1_b = 352;
-            std_f1_b = 12;    
-            avg_f2_b = 982;
-            std_f2_b = -220;
+            avg_f1_b = 370;
+            std_f1_b = 17;
+            avg_f2_b = 1864;
+            std_f2_b = 59;
 
         case "o"
             avg_f1_a = 566;
             std_f1_a = 44;
             avg_f2_a = 1117;
             std_f2_a = 56;
-            avg_f1_b = 500;
-            std_f1_b = 34;     
-            avg_f2_b = 1696;
-            std_f2_b = 188;
+            avg_f1_b = 681;
+            std_f1_b = 44;
+            avg_f2_b = 1419;
+            std_f2_b = 125;
       
     end
 

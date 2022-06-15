@@ -2,8 +2,14 @@
 % Created May 2013.
 % Last updated March 9, 2022 for this year's HW3.
 % Yi-Wen Liu
+% Modified to vowels transfrom final project
 
+%%
 clear; close all;
+%%
+load("../data_analysis_code/vowels.mat");
+load("../data_analysis_code/A_aves.mat")
+%%
 % Methods 
 Overlap = 1; %[CHANGE THIS!]
 Lookback =1; %[CHANGE THIS!]
@@ -14,7 +20,7 @@ fs = 16000;
 
 % INPUT DIR
 DIR = './sounds/';
-FILENAME = 'aiueo_a_aligned.wav';
+FILENAME = 'tea_contents.mp3';
 EXCITAT = './m3_sing/chest_excit_p30_LB_OL50_TR_32ms.wav';
 
 %OUTPUT FOLDER
@@ -137,9 +143,9 @@ for kk = 1:numFrames % frame index
             % Formant Conversion
             %voiced = IsVoiced(A);
             if median(abs(y_emph(ind))) > thres
-                [F1, F2, vowel] = vowel_classifier(A, fs);
+                [F1, F2, vowel] = vowel_classifier(A, fs, 0, air); % LP coefs, sf, mimum_vowel_probability
                 disp(vowel);
-                [A] = formant_transform_fun(A, F1, F2, vowel);
+                [A] = formant_transform(A, F1, F2, vowel, air, bone);
             else 
                 disp("unvoiced");
             end
@@ -247,13 +253,15 @@ for i = 1 : length(y_rec)
         y_rec(i) = 0.7*y_rec(i); % 80=0.5ms*16000frame/s attack
     end
 end
+%% LOW gain using average envelope/coefs
+y_low = filter(A_ave_bone, A_ave_air,y_rec);
 
 %% [INVESTIGATE] play the estimated source signal.
 % With a proper choice of LP order, frame length, and the pre-emphasis filter co
 % efficient, 
 % the sound should lack the original vowel quality in x[n].
 figure()    
-subplot(2,1,1)
+subplot(3,1,1)
 if ~Voice_Convert
     plot(y_rec)
     title('converted signal')
@@ -261,8 +269,10 @@ else
     plot(excit_disk)
     title('intput excitaion')
 end
-
-subplot(2,1,2)
+subplot(3,1,2)
+plot(y_low)
+title('converted signal(with low gain)')
+subplot(3,1,3)
 plot(y_emph)
 title('signal')
 %%
@@ -295,9 +305,11 @@ if write_to_disk == 1
     filename_ex = "excit_p"+ int2str(p)+ "_"+way;
     filename_rec = "rec_p"+ int2str(p)+ "_"+way;
     filename_vc = "vc_p"+ int2str(p)+ "_"+way;
+    filename_low = "low_p"+ int2str(p)+ "_"+way;
     if ~Voice_Convert
-        audiowrite(folder+filename_rec+"_fun.wav",y_rec,fs);
-        audiowrite(folder+filename_ex+"_fun.wav",excitat,fs);
+        audiowrite(folder+FILENAME(1:3)+"_"+filename_rec+".wav",y_rec,fs);
+        audiowrite(folder+FILENAME(1:3)+"_"+filename_ex+".wav",excitat,fs);
+        audiowrite(folder+FILENAME(1:3)+"_"+filename_ex+".wav",y_low,fs);
     else
         audiowrite(folder+filename_vc+".wav",y_vc,fs);
     end
