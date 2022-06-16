@@ -14,8 +14,8 @@ wav_path2 = [DIR FILENAME_2 '.wav'];
 wav_path3 = [DIR FILENAME_3 '.wav'];
 [y, fs1] = audioread(wav_path3);
 
-[A_ave_bone] = formant_analysis2(wav_path1,18, 0.4);
-[A_ave_air] = formant_analysis2(wav_path2, 18, 0.2);
+[A_ave_bone] = formant_analysis2(wav_path1, 10, 0.4);
+[A_ave_air] = formant_analysis2(wav_path2, 5, 0.2);
 save("A_aves.mat", "A_ave_bone", "A_ave_air")
 
 %out = filter(A_ave_2, A_ave_1,y);

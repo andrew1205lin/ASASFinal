@@ -129,6 +129,7 @@ for kk = 1:numFrames
     end
 end
 A_ave = zeros(1, p+1);
+LPcoeffs(:,1) = [];
 for i = 1: p+1
     A_ave(i) = median(LPcoeffs(i, :));
 end

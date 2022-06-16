@@ -132,7 +132,7 @@ for kk = 1:numFrames % frame index
             if median(abs(y_emph(ind))) > thres
                 [F1, F2, vowel] = vowel_classifier(A, fs, 0, air); % LP coefs, sf, mimum_vowel_probability
                 disp(vowel);
-                [A] = formant_transform(A, F1, F2, vowel, air, bone);
+                [A] = formant_transform(A, F1, F2, vowel, air, bone, "change");
             else 
                 disp("unvoiced");
             end

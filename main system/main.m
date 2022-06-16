@@ -41,7 +41,7 @@ end
 %sound(y,fs1);
 y = resample(y,fs,fs1);
 %% Parameters to play with
-framelen = 0.05; % second. [CHANGE THIS!]
+framelen = 0.1; % second. [CHANGE THIS!]
 p = 18; % linear prediction order. [CHANGE THIS!]
 thres_percent = 0.01;
 L = framelen*fs;
@@ -145,7 +145,7 @@ for kk = 1:numFrames % frame index
             if median(abs(y_emph(ind))) > thres
                 [F1, F2, vowel] = vowel_classifier(A, fs, 0, air); % LP coefs, sf, mimum_vowel_probability
                 disp(vowel);
-                [A] = formant_transform(A, F1, F2, vowel, air, bone);
+                [A] = formant_transform(A, F1, F2, vowel, air, bone, "normal");
             else 
                 disp("unvoiced");
             end
@@ -249,7 +249,14 @@ y_low = filter(A_ave_air, A_ave_bone ,y_rec);
 %freqz(A_ave_air, A_ave_bone, [], 16000)
 %% limiter
 y_low = limiter(y_low);
-
+%% air+bone conducted sound(air will delay about 0.494ms)
+% ear channel(2 cm) + mouth ear distance(15 cm)
+delay = 0.494;
+frame_delay = round(delay*fs/1000);
+portion = 0.5;
+y_wehear = zeros(1, length(y_low)+frame_delay);
+y_wehear(1: length(y_low)) = portion*y_low;
+y_wehear(frame_delay+1: end) = y_wehear(frame_delay+1: end) + portion*y_rec ;
 %% [INVESTIGATE] play the estimated source signal.
 % With a proper choice of LP order, frame length, and the pre-emphasis filter co
 % efficient, 
@@ -300,10 +307,12 @@ if write_to_disk == 1
     filename_rec = "rec_p"+ int2str(p)+ "_"+way;
     filename_vc = "vc_p"+ int2str(p)+ "_"+way;
     filename_low = "low_p"+ int2str(p)+ "_"+way;
+    filename_we = "wehear_p"+ int2str(p)+ "_"+way;
     if ~Voice_Convert
         audiowrite(folder+FILENAME(1:3)+"_"+filename_rec+".wav",y_rec,fs);
         audiowrite(folder+FILENAME(1:3)+"_"+filename_ex+".wav",excitat,fs);
         audiowrite(folder+FILENAME(1:3)+"_"+filename_low+".wav",y_low,fs);
+        audiowrite(folder+FILENAME(1:3)+"_"+filename_we+".wav",y_wehear,fs);
     else
         audiowrite(folder+filename_vc+".wav",y_vc,fs);
     end

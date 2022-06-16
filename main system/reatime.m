@@ -12,10 +12,10 @@
 load("../data_analysis_code/vowels.mat", "bone", "air");
 load("../data_analysis_code/A_aves.mat", "A_ave_air", "A_ave_bone")
 %% parameters
-inbuffer_dur = 0.3; % 1sec
+inbuffer_dur = 0.5; % 1sec
 outbuffer_dur = 0.3;
 sr = 16000;
-inbuffer_size = buffer_dur*sr;
+inbuffer_size = inbuffer_dur*sr;
 outbuffer_size = outbuffer_dur*sr;
 %% Create input and output objects
 deviceReader = audioDeviceReader(16000, inbuffer_size);

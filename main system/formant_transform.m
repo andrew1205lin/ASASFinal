@@ -1,6 +1,6 @@
-function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data)
-    f1_bound = [300, 1000];
-    f2_bound = [700, 2200];
+function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data, type)
+    f1_bound = [260, 1000];
+    f2_bound = [700, 3000];
     air = air_data;
     bone = bone_data;
     display = 0;
@@ -28,6 +28,7 @@ function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data)
     end
     if isnan(i_3dB)
         A_new = A;
+        fprintf("can't find -3db!");
         return
     end
     omega1 = W(locs(1));
@@ -36,13 +37,15 @@ function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data)
     r1 = 1-delta_omega1;
     A1 = [1 -2*r1*cos(omega1) r1*r1];
     i_3dB2 = nan;
-    for i=locs(2):2*locs(2)
+    max_i = min(1024, 2*locs(2));
+    for i=locs(2):max_i
         if abs(H(i)) < pks(2)*0.707
             i_3dB2 = i;
             break
         end
     end
     if isnan(i_3dB2)
+        fprintf("can't find -3db!");
         A_new = A;
         return
     end    
@@ -53,66 +56,123 @@ function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data)
     A2 = [1 -2*r2*cos(omega2) r2*r2];
     % error detect
     if f1 < f1_bound(1) || f1 > f1_bound(2) || f2 < f2_bound(1) || f2 > f2_bound(2)
-        fprintf("F1, F2 are not in the right place! Skip this transform!\n")
+        fprintf("F1: %.0f, F2: %.0f are not in the right place! Skip this transform!\n", f1, f2)
         A_new = A;
         return
     end
-    switch vowel
-        case "a"
-            avg_f1_a = air.a.f1_ave;
-            std_f1_a = air.a.f1_std;
-            avg_f2_a = air.a.f2_ave;
-            std_f2_a = air.a.f2_std;
-            avg_f1_b = bone.a.f1_ave;
-            std_f1_b = bone.a.f1_std;
-            avg_f2_b = bone.a.f2_ave;
-            std_f2_b = bone.a.f2_std;
-        case "i"
-            avg_f1_a = air.i.f1_ave;
-            std_f1_a = air.i.f1_std;
-            avg_f2_a = air.i.f2_ave;
-            std_f2_a = air.i.f2_std;
-            avg_f1_b = bone.i.f1_ave;
-            std_f1_b = bone.i.f1_std;     
-            avg_f2_b = bone.i.f2_ave;
-            std_f2_b = bone.i.f2_std;
-        case "u"
-           avg_f1_a = air.u.f1_ave;
-            std_f1_a = air.u.f1_std;
-            avg_f2_a = air.u.f2_ave;
-            std_f2_a = air.u.f2_std;
-            avg_f1_b = bone.u.f1_ave;
-            std_f1_b = bone.u.f1_std;     
-            avg_f2_b = bone.u.f2_ave;
-            std_f2_b = bone.u.f2_std;
-        case "e"
-           avg_f1_a = air.e.f1_ave;
-            std_f1_a = air.e.f1_std;
-            avg_f2_a = air.e.f2_ave;
-            std_f2_a = air.e.f2_std;
-            avg_f1_b = bone.e.f1_ave;
-            std_f1_b = bone.e.f1_std;     
-            avg_f2_b = bone.e.f2_ave;
-            std_f2_b = bone.e.f2_std;
-        case "o"
-           avg_f1_a = air.o.f1_ave;
-            std_f1_a = air.o.f1_std;
-            avg_f2_a = air.o.f2_ave;
-            std_f2_a = air.o.f2_std;
-            avg_f1_b = bone.o.f1_ave;
-            std_f1_b = bone.o.f1_std;     
-            avg_f2_b = bone.o.f2_ave;
-            std_f2_b = bone.o.f2_std;
+    if type == "change"
+        switch vowel
+            case "a"
+                avg_f1_a = air.a.f1_ave;
+                std_f1_a = air.a.f1_std;
+                avg_f2_a = air.a.f2_ave;
+                std_f2_a = air.a.f2_std;
+                avg_f1_b = bone.i.f1_ave;
+                std_f1_b = bone.i.f1_std;
+                avg_f2_b = bone.i.f2_ave;
+                std_f2_b = bone.i.f2_std;
+            case "i"
+                avg_f1_a = air.i.f1_ave;
+                std_f1_a = air.i.f1_std;
+                avg_f2_a = air.i.f2_ave;
+                std_f2_a = air.i.f2_std;
+                avg_f1_b = bone.u.f1_ave;
+                std_f1_b = bone.u.f1_std;
+                avg_f2_b = bone.u.f2_ave;
+                std_f2_b = bone.u.f2_std;
+            case "u"
+                avg_f1_a = air.u.f1_ave;
+                std_f1_a = air.u.f1_std;
+                avg_f2_a = air.u.f2_ave;
+                std_f2_a = air.u.f2_std;
+
+                avg_f1_b = bone.e.f1_ave;
+                std_f1_b = bone.e.f1_std;
+                avg_f2_b = bone.e.f2_ave;
+                std_f2_b = bone.e.f2_std;
+            case "e"
+                avg_f1_a = air.e.f1_ave;
+                std_f1_a = air.e.f1_std;
+                avg_f2_a = air.e.f2_ave;
+                std_f2_a = air.e.f2_std;
+
+                avg_f1_b = bone.o.f1_ave;
+                std_f1_b = bone.o.f1_std;
+                avg_f2_b = bone.o.f2_ave;
+                std_f2_b = bone.o.f2_std;
+            case "o"
+                avg_f1_a = air.o.f1_ave;
+                std_f1_a = air.o.f1_std;
+                avg_f2_a = air.o.f2_ave;
+                std_f2_a = air.o.f2_std;
+
+                avg_f1_b = bone.a.f1_ave;
+                std_f1_b = bone.a.f1_std;
+                avg_f2_b = bone.a.f2_ave;
+                std_f2_b = bone.a.f2_std;
+        end
+    else
+        switch vowel
+            case "a"
+                avg_f1_a = air.a.f1_ave;
+                std_f1_a = air.a.f1_std;
+                avg_f2_a = air.a.f2_ave;
+                std_f2_a = air.a.f2_std;
+                avg_f1_b = bone.a.f1_ave;
+                std_f1_b = bone.a.f1_std;
+                avg_f2_b = bone.a.f2_ave;
+                std_f2_b = bone.a.f2_std;
+            case "i"
+                avg_f1_a = air.i.f1_ave;
+                std_f1_a = air.i.f1_std;
+                avg_f2_a = air.i.f2_ave;
+                std_f2_a = air.i.f2_std;
+                avg_f1_b = bone.i.f1_ave;
+                std_f1_b = bone.i.f1_std;
+                avg_f2_b = bone.i.f2_ave;
+                std_f2_b = bone.i.f2_std;
+            case "u"
+                avg_f1_a = air.u.f1_ave;
+                std_f1_a = air.u.f1_std;
+                avg_f2_a = air.u.f2_ave;
+                std_f2_a = air.u.f2_std;
+                avg_f1_b = bone.u.f1_ave;
+                std_f1_b = bone.u.f1_std;
+                avg_f2_b = bone.u.f2_ave;
+                std_f2_b = bone.u.f2_std;
+            case "e"
+                avg_f1_a = air.e.f1_ave;
+                std_f1_a = air.e.f1_std;
+                avg_f2_a = air.e.f2_ave;
+                std_f2_a = air.e.f2_std;
+                avg_f1_b = bone.e.f1_ave;
+                std_f1_b = bone.e.f1_std;
+                avg_f2_b = bone.e.f2_ave;
+                std_f2_b = bone.e.f2_std;
+            case "o"
+                avg_f1_a = air.o.f1_ave;
+                std_f1_a = air.o.f1_std;
+                avg_f2_a = air.o.f2_ave;
+                std_f2_a = air.o.f2_std;
+                avg_f1_b = bone.o.f1_ave;
+                std_f1_b = bone.o.f1_std;
+                avg_f2_b = bone.o.f2_ave;
+                std_f2_b = bone.o.f2_std;
+        end
     end
+
     f3 = (((omega1*dpi)-avg_f1_a)*(std_f1_b/std_f1_a)+avg_f1_b);
     f4 = (((omega2*dpi)-avg_f2_a)*(std_f2_b/std_f2_a)+avg_f2_b);
     if f4 - f3 < 300 % fix the clipping bug
         f4 = f3 + 350;
         fprintf("too close! set f2' to f1' + 350\n")
     end
-    % error detect
+    % bound the value
+    f3 = min(max(f3, f1_bound(1)), f1_bound(2));
+    f4 = min(max(f4, f2_bound(1)), f2_bound(2));
+
     if f3 < f1_bound(1) || f3 > f1_bound(2) || f4 < f2_bound(1) || f4 > f2_bound(2)
-        fprintf("F1', F2' are not in the right place! Skip this transform!\n")
+        fprintf("F1': %.0f, F2': %.0f are not in the right place! Skip this transform!\n", f3, f4)
         A_new = A;
         return
     end
