@@ -1,14 +1,12 @@
 %% EE6641 HW: Linear prediction and time-varying filtering
-% Created May 2013.
+% Created May 2013.data
 % Last updated March 9, 2022 for this year's HW3.
 % Yi-Wen Liu
 % Modified to vowels transfrom final project
-
+function y_low = mainAsFunc(y, sr)
 %%
-clear; close all;
-%%
-load("../data_analysis_code/vowels.mat");
-load("../data_analysis_code/A_aves.mat")
+load("../data_analysis_code/vowels.mat", "bone", "air");
+load("../data_analysis_code/A_aves.mat", "A_ave_air", "A_ave_bone")
 %%
 % Methods 
 Overlap = 1; %[CHANGE THIS!]
@@ -16,18 +14,9 @@ Lookback =1; %[CHANGE THIS!]
 Tail_rm = 1; %[CHANGE THIS!]
 Voice_Convert = 0; %[CHANGE THIS!]
 write_to_disk = 1; %[CHANGE THIS!]
-fs = 16000;
+fs = sr;
 
-% INPUT DIR
-DIR = './sounds/';
-FILENAME = 'tea_contents.mp3';
-EXCITAT = './m3_sing/chest_excit_p30_LB_OL50_TR_32ms.wav';
 
-%OUTPUT FOLDER
-folder = "./Results/";
-
-%FILENAME = 'i-male-singing.wav';
-[y,fs1] = audioread([DIR FILENAME]);
 if Voice_Convert == 1
     [excit_disk, fs2] = audioread(EXCITAT);
     excit_disk = resample(excit_disk, fs, fs2);
@@ -38,8 +27,6 @@ if sz(2) ==2
     y = (y(:, 1) + y(:, 2))./2;
 end
 
-%sound(y,fs1);
-y = resample(y,fs,fs1);
 %% Parameters to play with
 framelen = 0.05; % second. [CHANGE THIS!]
 p = 18; % linear prediction order. [CHANGE THIS!]
@@ -250,64 +237,5 @@ y_low = filter(A_ave_air, A_ave_bone ,y_rec);
 %% limiter
 y_low = limiter(y_low);
 
-%% [INVESTIGATE] play the estimated source signal.
-% With a proper choice of LP order, frame length, and the pre-emphasis filter co
-% efficient, 
-% the sound should lack the original vowel quality in x[n].
-figure()    
-subplot(3,1,1)
-if ~Voice_Convert
-    plot(y_rec)
-    title('converted signal')
-else
-    plot(excit_disk)
-    title('intput excitaion')
-end
-subplot(3,1,2)
-plot(y_low)
-title('converted signal(with low gain)')
-subplot(3,1,3)
-plot(y_emph)
-title('signal')
-%%
-% sound(excitat,fs); 
-% sound(y_rec,fs);
 
-way = "";
-if Lookback
-    way = way + "LB";
-else
-    way = way + "noLB";
 end
-if Overlap
-    way = way + "_OL50";
-else
-    way = way + "_noOL";
-end
-if Tail_rm
-    way = way + "_TR_";
-else
-    way = way + "_noTR_";
-end
-if Window == "Hamming"
-    way = way+ "_Ham";
-end
-way = way+num2str(framelen*1000)+"ms";
-
-
-if write_to_disk == 1
-    filename_ex = "excit_p"+ int2str(p)+ "_"+way;
-    filename_rec = "rec_p"+ int2str(p)+ "_"+way;
-    filename_vc = "vc_p"+ int2str(p)+ "_"+way;
-    filename_low = "low_p"+ int2str(p)+ "_"+way;
-    if ~Voice_Convert
-        audiowrite(folder+FILENAME(1:3)+"_"+filename_rec+".wav",y_rec,fs);
-        audiowrite(folder+FILENAME(1:3)+"_"+filename_ex+".wav",excitat,fs);
-        audiowrite(folder+FILENAME(1:3)+"_"+filename_low+".wav",y_low,fs);
-    else
-        audiowrite(folder+filename_vc+".wav",y_vc,fs);
-    end
-end
-%setFontSizeForAll(18); % This function is a plotting routine I created. 
-                        % It goes through all the figures and set the font
-                        % the same size.
