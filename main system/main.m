@@ -20,7 +20,7 @@ fs = 16000;
 
 % INPUT DIR
 DIR = './sounds/';
-FILENAME = 'tea_contents.mp3';
+FILENAME = 'aiueo.flac';
 EXCITAT = './m3_sing/chest_excit_p30_LB_OL50_TR_32ms.wav';
 
 %OUTPUT FOLDER
@@ -41,9 +41,9 @@ end
 %sound(y,fs1);
 y = resample(y,fs,fs1);
 %% Parameters to play with
-framelen = 0.1; % second. [CHANGE THIS!]
+framelen = 0.05; % second. [CHANGE THIS!]
 p = 18; % linear prediction order. [CHANGE THIS!]
-thres_percent = 0.01;
+thres_percent = 0.02;
 L = framelen*fs;
 if L<=p
     disp('Linear prediction requires the num of equations to be greater than the number of variables.');
@@ -108,6 +108,7 @@ y_vc_n = zeros(1,p+nsc);
 % set a threshold for voice activity detection
 ymax = max(abs(y_emph));
 thres = thres_percent*ymax;
+A_last = [1 zeros(1, p)];
 for kk = 1:numFrames % frame index
     start = (kk-1)*step+1;
     final = start - 1+L;
@@ -142,15 +143,28 @@ for kk = 1:numFrames % frame index
             e_n = conv(A, y_n); % E = A*Y_N
             % Formant Conversion
             %voiced = IsVoiced(A);
-            if median(abs(y_emph(ind))) > thres
+            if quantile(abs(y_emph(ind)), 0.9) > thres
+            %if isvoiced(y_emph(ind))
+                %count = count +1;
+                %if count == 3
                 [F1, F2, vowel] = vowel_classifier(A, fs, 0, air); % LP coefs, sf, mimum_vowel_probability
                 disp(vowel);
-                [A] = formant_transform(A, F1, F2, vowel, air, bone, "normal");
+                [A_new] = formant_transform(A, A_last, F1, F2, vowel, air, bone, "normal");
+                y_rec_n = filter(1, A_new, e_n); % Y_N = E/A
             else 
                 disp("unvoiced");
+                y_rec_n = filter(1, A, e_n); % Y_N = E/A
             end
-            
-            y_rec_n = filter(1, A, e_n); % Y_N = E/A
+
+            if max(y_rec_n) > 1
+                  figure
+                  [h, f] = freqz(1,A,Nfreqs, 16000);
+                  [h_new, f] = freqz(1,A_new,Nfreqs, 16000);
+                  plot(f ,20*log10(abs(h)))
+                  hold on
+                  plot(f ,20*log10(abs(h_new)))
+                  pause;
+            end
         else
             e_n = excit_disk(ind);
             y_vc_n = filter(1, A, e_n);
@@ -245,7 +259,7 @@ end
 y_rec(isnan(y_rec)) = 0;
 y_rec = limiter(y_rec);
 %% LOW gain using average envelope/coefs
-y_low = filter(A_ave_air, A_ave_bone ,y_rec);
+y_low = filter(A_ave_air, 0.5*(A_ave_bone) ,y_rec);
 %freqz(A_ave_air, A_ave_bone, [], 16000)
 %% limiter
 y_low = limiter(y_low);
@@ -271,7 +285,7 @@ else
     title('intput excitaion')
 end
 subplot(3,1,2)
-plot(y_low)
+plot(excitat)
 title('converted signal(with low gain)')
 subplot(3,1,3)
 plot(y_emph)

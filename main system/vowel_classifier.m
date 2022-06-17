@@ -2,6 +2,8 @@ function [f1, f2, vowel] = vowel_classifier(A, fs, threshold ,air_data)
 air = air_data;
 % input: LPC coefs, fs
 % output: f1, f2, vowel
+%% method 1(find pole, may be wrong)
+%{
 poles = roots(A); % A->zero; 1/A->pole\, this will on a complex plain: poles = moduli*e^(j*omega)
 omega = angle(poles); % between  -pi and pi
 moduli = abs(poles); % magnitude
@@ -13,6 +15,14 @@ tmp_matrix = [poles omega moduli];
 tmp_matrix = sortrows(tmp_matrix,2);
 f1 = tmp_matrix(1,2)/pi*fs/2; % Hz, 1st formant
 f2 = tmp_matrix(2,2)/pi*fs/2; % Hz, 2nd formant
+%}
+%% method 2(find peak)
+Nfreqs = 1024;
+[H,W] = freqz(1,A,Nfreqs);
+[pks,locs] = findpeaks(abs(H));
+f1 = W(locs(1))*fs/(2*pi);
+f2 = W(locs(2))*fs/(2*pi);
+%%
 % f3 = tmp_matrix(3,2)/pi*fs/2; % 3rd formant
 % New version( multivariate normal distribution)
 probab_a = mvnpdf([f1, f2], [air.a.f1_ave, air.a.f2_ave], [air.a.f1_std^2, air.a.f2_std^2]);

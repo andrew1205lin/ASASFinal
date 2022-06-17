@@ -1,6 +1,8 @@
-function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data, type)
-    f1_bound = [260, 1000];
-    f2_bound = [700, 3000];
+function [A_new, error_detect] = formant_transform(A, A_last,  F1, F2, vowel, air_data, bone_data, type)
+    f1_bound = [200, 1000];
+    f2_bound = [650, 2400];
+    error_detect = 0;
+    debug = 0;
     air = air_data;
     bone = bone_data;
     display = 0;
@@ -8,7 +10,7 @@ function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data, type
         A_new = A;
         return
     end
-
+    
     Nfreqs = 1024;
     fs = 16000;
     df = fs/2/Nfreqs;
@@ -19,6 +21,17 @@ function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data, type
     [pks,locs] = findpeaks(abs(H));
     true_F1 = [pks(1) locs(1)*df];
     true_F2 = [pks(2) locs(2)*df];
+
+    if 20*log10(pks(1)) > 35 || 20*log10(pks(2)) > 35
+        fprintf("this frame has dangerous feedback peak\n")
+        if debug
+            [h, f] = freqz(1,A,Nfreqs, 16000);
+            plot(f ,20*log(abs(h)))
+            xline(F1)
+            xline(F2)
+            %pause
+        end
+    end
     i_3dB = nan;
     for i=locs(1):-1:1
         if abs(H(i)) < pks(1)*0.707
@@ -27,11 +40,30 @@ function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data, type
         end
     end
     if isnan(i_3dB)
+        i = locs(1) +1;
+        while abs(H(i)) - abs(H(i+1)) >0
+        if abs(H(i)) < pks(1)*0.707
+            i_3dB = i;
+            break
+        end
+        i = i + 1;
+        end
+    end
+    if isnan(i_3dB)
         A_new = A;
-        fprintf("can't find -3db!");
+        fprintf("F1 can't find -3db! Won't change!\n");
+        % debug
+        if debug 
+            [h, f] = freqz(1,A,Nfreqs, 16000);
+            plot(f ,20*log10(abs(h)))
+            xline(F1)
+            pause
+        end
+        error_detect = 1;
         return
     end
     omega1 = W(locs(1));
+    %omega1 = F1/dpi;
     f1 = omega1*dpi;
     delta_omega1 = (omega1-W(i_3dB));
     r1 = 1-delta_omega1;
@@ -45,18 +77,26 @@ function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data, type
         end
     end
     if isnan(i_3dB2)
-        fprintf("can't find -3db!");
-        A_new = A;
+        fprintf("F2 can't find -3db! Use last one!\n");
+        A_new = A_last;
+        % debug
+        if debug
+            [h, f] = freqz(1,A,Nfreqs, 16000);
+            plot(f ,20*log10(abs(h)))
+            xline(F2);
+            pause
+        end
         return
     end    
     omega2 = W(locs(2));
+    %omega2 = F2/dpi;
     f2 = omega2*dpi;
     delta_omega2 = (W(i_3dB2)-omega2);
     r2 = 1-delta_omega2;
     A2 = [1 -2*r2*cos(omega2) r2*r2];
     % error detect
-    if f1 < f1_bound(1) || f1 > f1_bound(2) || f2 < f2_bound(1) || f2 > f2_bound(2)
-        fprintf("F1: %.0f, F2: %.0f are not in the right place! Skip this transform!\n", f1, f2)
+    if f1 < f1_bound(1) || f1 > f1_bound(2) || f2 < f2_bound(1) || f2 > f2_bound(2) 
+        fprintf("F1: %.0f, F2: %.0f are not in the right place! Won't change!\n", f1, f2)
         A_new = A;
         return
     end
@@ -193,7 +233,27 @@ function [A_new] = formant_transform(A, F1, F2, vowel, air_data, bone_data, type
     Atemp3= filter(A3, 1, Atemp2);
     A_new = filter(A4, 1, Atemp3);
 
-
+    [H,W] = freqz(1,A_new,Nfreqs);
+    [pks,locs] = findpeaks(20*log10(abs(H)));
+    % rules
+    %pks(1)> 45 || pks(2) > 40 || pks(3) > 24 || max(pks) > 35 || pks(3) - pks(1) > 15 || pks(1) - pks(2) > 20
+    if  pks(2) - pks(1) > 7.5 || pks(1) - pks(2) > 20
+        fprintf("this frame produces dangerous feedback pk1: %.3fhz %.2fdB, pk2: %.0fhz %.2fdB\n", ...
+            W(locs(1))*fs/(pi), pks(1), W(locs(2))*fs/(pi), pks(2))
+        if debug
+            [h_new, f] = freqz(1,A_new,Nfreqs, 16000);
+            [h, f] = freqz(1,A,Nfreqs, 16000);
+            plot(f ,20*log10(abs(h_new)))
+            plot(f, 20*log10(abs(h)))
+            xline(f3)
+            xline(f4)
+            legend("new", "original")
+            pause;
+        end
+        A_new = A;
+        return;
+    end
+   
     if display 
         [H1,~]=freqz(1,A1,Nfreqs);
         [H2,~]=freqz(1,A2,Nfreqs);

@@ -1,48 +1,64 @@
 clear; close all;
 %%
+input = "andrew";
+%%
 DIR = './sounds/';
 save2txt = 0;
 %FILENAME = '魚兒-餘額.wav';
 %FILENAME = '知識-姿勢.wav';
 %FILENAME = '白金-白鯨.wav'
 %FILENAME = '銀幕-螢幕.wav';
-FILENAME_1 = 'i_a_aligned';
-FILENAME_2 = 'e_a_aligned';
-FILENAME_3 = 'a_a_aligned';
-FILENAME_4 = 'o_a_aligned';
-FILENAME_5 = 'u_a_aligned';
-
+switch input
+    case "tony"
+        FILENAME_1 = 'i_a_aligned';
+        FILENAME_2 = 'e_a_aligned';
+        FILENAME_3 = 'a_a_aligned';
+        FILENAME_4 = 'o_a_aligned';
+        FILENAME_5 = 'u_a_aligned';
+    case "andrew"
+        FILENAME_1 = 'i';
+        FILENAME_2 = 'e';
+        FILENAME_3 = 'a';
+        FILENAME_4 = 'o';
+        FILENAME_5 = 'u';
+end
 FILENAME_6 = 'i_b_denoised';
 FILENAME_7 = 'e_b_denoised';
 FILENAME_8 = 'a_b_denoised';
 FILENAME_9 = 'o_b_denoised';
 FILENAME_10 = 'u_b_denoised';
 
-
-
-wav_path1 = [DIR FILENAME_1 '.wav'];
-wav_path2 = [DIR FILENAME_2 '.wav'];
-wav_path3 = [DIR FILENAME_3 '.wav'];
-wav_path4 = [DIR FILENAME_4 '.wav'];
-wav_path5 = [DIR FILENAME_5 '.wav'];
+switch input
+    case "tony"
+        wav_path1 = [DIR FILENAME_1 '.wav'];
+        wav_path2 = [DIR FILENAME_2 '.wav'];
+        wav_path3 = [DIR FILENAME_3 '.wav'];
+        wav_path4 = [DIR FILENAME_4 '.wav'];
+        wav_path5 = [DIR FILENAME_5 '.wav'];
+    case "andrew"
+        wav_path1 = [DIR FILENAME_1 '.flac'];
+        wav_path2 = [DIR FILENAME_2 '.flac'];
+        wav_path3 = [DIR FILENAME_3 '.flac'];
+        wav_path4 = [DIR FILENAME_4 '.flac'];
+        wav_path5 = [DIR FILENAME_5 '.flac'];
+end
 wav_path6 = [DIR FILENAME_6 '.wav'];
-
 wav_path7 = [DIR FILENAME_7 '.wav'];
 wav_path8 = [DIR FILENAME_8 '.wav'];
 wav_path9 = [DIR FILENAME_9 '.wav'];
 wav_path10 = [DIR FILENAME_10 '.wav'];
 
-[F1_1, F2_1, F3_1, ~] = formant_analysis(wav_path1, 0.01);
-[F1_2, F2_2, F3_2, ~] = formant_analysis(wav_path2, 0.01);
-[F1_3, F2_3, F3_3, ~] = formant_analysis(wav_path3, 0.01);
-[F1_4, F2_4, F3_4, ~] = formant_analysis(wav_path4, 0.01);
-[F1_5, F2_5, F3_5, ~] = formant_analysis(wav_path5, 0.01);
+[F1_1, F2_1, F3_1] = formant_analysis(wav_path1, 0.1);
+[F1_2, F2_2, F3_2] = formant_analysis(wav_path2, 0.1);
+[F1_3, F2_3, F3_3] = formant_analysis(wav_path3, 0.1);
+[F1_4, F2_4, F3_4] = formant_analysis(wav_path4, 0.1);
+[F1_5, F2_5, F3_5] = formant_analysis(wav_path5, 0.1);
 
-[F1_6, F2_6, F3_6, ~] = formant_analysis(wav_path6, 0.4);
-[F1_7, F2_7, F3_7, ~] = formant_analysis(wav_path7, 0.4);
-[F1_8, F2_8, F3_8, ~] = formant_analysis(wav_path8, 0.4);
-[F1_9, F2_9, F3_9, ~] = formant_analysis(wav_path9, 0.4);
-[F1_10, F2_10, F3_10, ~] = formant_analysis(wav_path10, 0.4);
+[F1_6, F2_6, F3_6] = formant_analysis(wav_path6, 0.4);
+[F1_7, F2_7, F3_7] = formant_analysis(wav_path7, 0.4);
+[F1_8, F2_8, F3_8] = formant_analysis(wav_path8, 0.4);
+[F1_9, F2_9, F3_9] = formant_analysis(wav_path9, 0.4);
+[F1_10, F2_10, F3_10] = formant_analysis(wav_path10, 0.4);
 % remove zeros
 % F1_1 = F1_1(F1_1~=0);
 % F2_1 = F2_1(F2_1~=0);
@@ -58,7 +74,7 @@ wav_path10 = [DIR FILENAME_10 '.wav'];
 % remove unreliable points(distance bigger than 1 std will be rm)
 [F1_1, F2_1] = data_cleaner(F1_1, F2_1, 2.5); 
 [F1_2, F2_2] = data_cleaner(F1_2, F2_2, 2.5);
-[F1_3, F2_3] = data_cleaner(F1_3, F2_3, 2.5);
+[F1_3, F2_3] = data_cleaner(F1_3, F2_3, 2);
 [F1_4, F2_4] = data_cleaner(F1_4, F2_4, 2.5);
 [F1_5, F2_5] = data_cleaner(F1_5, F2_5, 2.5);
 

@@ -7,7 +7,7 @@
 % Output: F1,F2, F3 (arrays)
 %%%%%%%%%%%%%%%%
 
-function [f1, f2, f3, A_ave] = formant_analysis(wav_path, thres_percent)
+function [f1, f2, f3] = formant_analysis(wav_path, thres_percent)
 [y, fs1] = audioread(wav_path);
 
 %% stereo to mono
@@ -122,6 +122,8 @@ for kk = 1:numFrames
         %pause;
     end
     LPcoeffs(:,kk) = A;
+    %% pole method( dicarded )
+    %{
     poles = roots(A); % A->zero; 1/A->pole\, this will on a complex plain: poles = moduli*e^(j*omega)
     omega = angle(poles); % between  -pi and pi
     moduli = abs(poles); % magnitude
@@ -132,13 +134,18 @@ for kk = 1:numFrames
     tmp_matrix = [poles omega moduli];
     tmp_matrix = sortrows(tmp_matrix,2);
     if max(abs(y_emph(ind))) > thres % voice activity detected
-        f1(kk) = tmp_matrix(1,2)/pi*fs/2; % Hz, 1st formant
+        f1(kk) = tmp_matrix(1,2)/pi*fs/2; % Hz, 1st for\
+'mant
         f2(kk) = tmp_matrix(2,2)/pi*fs/2; % Hz, 2nd formant
         f3(kk) = tmp_matrix(3,2)/pi*fs/2; % 3rd formant
     end
-    A_ave = zeros(1, p+1);
-    for i = 1: p+1
-        A_ave(i) = median(LPcoeffs(i, :));
+    %}
+    if max(abs(y_emph(ind))) > thres
+        [H,W] = freqz(1,A,Nfreqs);
+        [~,locs] = findpeaks(abs(H));
+        f1(kk) = W(locs(1))*fs/(2*pi);
+        f2(kk) = W(locs(2))*fs/(2*pi);
+        f3(kk) = W(locs(3))*fs/(2*pi);
     end
 end
 
