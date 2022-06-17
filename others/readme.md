@@ -6,7 +6,7 @@ run data_anlysis_code/main2.m
 ## Converter
 run main system/main.m
 ## System Diagram
-![](https://drive.google.com/uc?export=download&id=1Nd0XY1QbqZsmq1VjfeDzuE6UHKl7Qy69)
+![](https://drive.google.com/uc?export=download&id=1KIII6pRoGD1coMNcQqy_ohDI_9RBxMtN)
 ## Others
 ### Future Improvement
 1. Gausian probability to force classify the vowel to the highest probablility (V)
