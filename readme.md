@@ -14,3 +14,14 @@ run main system/main.m
 3. Try Different People's vowel convertion (use Formant Shifer)
 4. Implement Bone Conduction realtime(use Average envelope convertion)
 
+## Results:  
+Original air-conducted voice (Reconstructed by LPC):  
+https://drive.google.com/file/d/1BC8axDKnI5zxOpFkTeYbVPpUb7JpzUkb/view?usp=share_link  
+Generated bone-conducted voice (Internal Voice):  
+https://drive.google.com/file/d/1B1Jdxo1mk9HPJw2liBKSuIc17hy3cm-C/view?usp=share_link  
+Voice we heard (bone + delay air):  
+https://drive.google.com/file/d/1BG-MjO_fxvkOHFQaxw-Ki9QXV1gMZZLc/view?usp=share_link  
+
+
+
+
